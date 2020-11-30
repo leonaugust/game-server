@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <conversionRule conversionWord="colorOn" converterClass="common.util.logging.ColorOnConverter"/>
+    <conversionRule conversionWord="colorOff" converterClass="common.util.logging.ColorOffConverter"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                %colorOn%-50(%date{HH:mm:ss.SSS} %level [%thread] ) %msg ## at %c.%M\(%F:%L\)%colorOff%n%throwable
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="com.zaxxer.hikari">
+        <level value="WARN"/>
+    </logger>
+
+    <logger name="io.netty">
+        <level value="WARN"/>
+    </logger>
+
+    <root>
+        <level value="DEBUG"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

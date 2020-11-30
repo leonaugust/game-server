@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <util:map id="levelsConfig" key-type="java.lang.Integer" value-type="java.lang.Integer">
+        <entry key="2" value="20"/>
+        <entry key="3" value="30"/>
+        <entry key="4" value="50"/>
+        <entry key="5" value="100"/>
+    </util:map>
+
+    <util:map id="levelUpAwardConfig" key-type="java.lang.Integer">
+        <entry key="2">
+            <bean class="common.dto.AwardStructure" p:money="100" p:energy="100"/>
+        </entry>
+        <entry key="3">
+            <bean class="common.dto.AwardStructure" p:money="100" p:energy="100"/>
+        </entry>
+        <entry key="4">
+            <bean class="common.dto.AwardStructure" p:money="100" p:energy="100"/>
+        </entry>
+        <entry key="5">
+            <bean class="common.dto.AwardStructure" p:money="100" p:energy="100"/>
+        </entry>
+    </util:map>
+
+</beans>
