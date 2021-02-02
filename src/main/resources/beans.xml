@@ -25,4 +25,13 @@
         </entry>
     </util:map>
 
+    <util:map id="defaultUserProperties" key-type="java.lang.String">
+        <entry key="name" value=""/>
+        <entry key="level" value="1"/>
+        <entry key="experience" value="0"/>
+        <entry key="energy" value="25"/>
+        <entry key="rating" value="0"/>
+        <entry key="money" value="100"/>
+    </util:map>
+
 </beans>
