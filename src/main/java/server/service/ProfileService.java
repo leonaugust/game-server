@@ -1,6 +1,9 @@
 package server.service;
 
 import common.dto.AwardStructure;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
@@ -39,6 +42,21 @@ public class ProfileService {
             profile.setExperience(currentExperience);
         }
         return award;
+    }
+
+    public boolean changeUsername(UserProfile profile, String newUsername) {
+        Instant nameChangedDate = profile.getNameChangedDate().toInstant()
+            .truncatedTo(ChronoUnit.DAYS);
+        Instant today = Instant.now()
+            .truncatedTo(ChronoUnit.DAYS);
+        if (nameChangedDate.equals(today)) {
+            return false;
+        }
+        profile.setName(newUsername);
+        profile.setNameChangedDate(Date.from(today));
+        userProfileRegistry.updateUserProfile(profile);
+        log.info("changeUsername for profile {}", profile.id);
+        return true;
     }
 
     public UserProfile findUserProfileOrCreateNew(String uid){
