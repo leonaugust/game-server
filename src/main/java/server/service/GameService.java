@@ -1,21 +1,25 @@
 package server.service;
 
+
+import common.dto.AwardStructure;
+import common.messages.FinishGameResponse;
 import common.messages.StartGameResponse;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import platform.service.UserProfileRegistry;
 import platform.session.SessionMap;
+import server.common.GameResult;
 import server.common.ProfileState;
+import server.config.GameConfig;
 import server.domain.UserProfile;
 
 @Service
 public class GameService {
 
-  @Value("${energy.price.for.game}")
-  private int energyPriceForGame;
+  @Resource
+  private GameConfig gameConfig;
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -35,11 +39,11 @@ public class GameService {
     }
 
     var energy = profile.getEnergy();
-    if (energy < energyPriceForGame) {
+    if (energy < gameConfig.getEnergyPriceForGame()) {
       response.errorCode = 1;
       response.errorMessage = "Not enough energy!";
     } else {
-      profile.setEnergy(energy - energyPriceForGame);
+      profile.setEnergy(energy - gameConfig.getEnergyPriceForGame());
       profile.setState(ProfileState.IN_GAME);
       registry.updateUserProfile(profile);
     }
@@ -47,5 +51,31 @@ public class GameService {
     return response;
   }
 
+  public FinishGameResponse finishGame(int profileId, GameResult result) {
+    FinishGameResponse response = new FinishGameResponse();
+    response.award = new AwardStructure();
+    UserProfile profile = (UserProfile) sessionMap.getSessionByProfileId(profileId).profile;
+    if (!profile.getState().equals(ProfileState.IN_GAME)) {
+      return response;
+    }
+
+    var experience = profile.getExperience();
+    var rating = profile.getRating();
+    if (result == GameResult.WIN) {
+      experience += gameConfig.getExperienceRewardWin();
+      rating += gameConfig.getRatingResultWin();
+      profile.setMoney(profile.getMoney() + gameConfig.getMoneyRewardWin());
+      response.award.money = gameConfig.getMoneyRewardWin();
+    } else {
+      experience += gameConfig.getExperienceRewardDefeat();
+      rating = Math.max(rating + gameConfig.getRatingResultDefeat(), gameConfig.getRatingMinimal());
+    }
+    profile.setExperience(experience);
+    profile.setRating(rating);
+    profile.setState(ProfileState.MAIN_MENU);
+    registry.updateUserProfile(profile);
+    log.info("finishGame for user {}", profileId);
+    return response;
+  }
 
 }
