@@ -30,6 +30,9 @@ public class GameService {
   private ProfileService profileService;
 
   @Resource
+  private TopService topService;
+
+  @Resource
   private SessionMap sessionMap;
 
   public StartGameResponse startGame(int profileId) {
@@ -83,6 +86,7 @@ public class GameService {
     profile.setRating(rating);
     profile.setState(ProfileState.MAIN_MENU);
     registry.updateUserProfile(profile);
+    topService.onRatingChange(profile);
     log.info("finishGame for user {}", profileId);
     return response;
   }
