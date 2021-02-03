@@ -1,11 +1,15 @@
 package client;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import common.dto.AwardStructure;
 import common.messages.FinishGameRequest;
 import common.messages.FinishGameResponse;
+import java.util.Map;
 import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import platform.session.SessionMap;
 import server.ServerApplication;
@@ -24,6 +28,9 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
 
   @Resource
   private GameConfig gameConfig;
+
+  @Value("#{levelUpAwardConfig}")
+  private Map<Integer, AwardStructure> levelUpAwardConfig;
 
   @Test
   public void finishGameWhenUserIsNotPlayingTest() {
@@ -56,7 +63,29 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
     assertSame(experience + gameConfig.getExperienceRewardWin(), profile.getExperience());
     assertSame(rating + gameConfig.getRatingResultWin(), profile.getRating());
     assertSame(money + gameConfig.getMoneyRewardWin(), profile.getMoney());
-    assertSame(gameConfig.getMoneyRewardWin(), response.award.money);
+    assertSame(ProfileState.MAIN_MENU, profile.getState());
+  }
+
+  @Test
+  public void finishGameWithLevelUpTest() {
+    successLoginTest();
+
+    profile = (UserProfile) sessionMap.getSessionByProfileId(enterAccount.userProfile.id).profile;
+    profile.setExperience(15);
+    var rating = profile.getRating();
+    var money = profile.getMoney();
+    var energy = profile.getEnergy();
+    profile.setState(ProfileState.IN_GAME);
+
+    FinishGameResponse response = clientConnection
+        .request(new FinishGameRequest(GameResult.WIN), FinishGameResponse.class);
+    AwardStructure award = levelUpAwardConfig.get(profile.getLevel() + 1);
+
+    assertSame(5, profile.getExperience());
+    assertSame(2, profile.getLevel());
+    assertSame(rating + gameConfig.getRatingResultWin(), profile.getRating());
+    assertEquals(money + gameConfig.getMoneyRewardWin() + award.getMoney(), profile.getMoney());
+    assertEquals(energy + award.getEnergy(), profile.getEnergy());
     assertSame(ProfileState.MAIN_MENU, profile.getState());
   }
 
@@ -75,7 +104,6 @@ public class FinishGameRequestTest extends ConnectAndLoginTests {
     assertSame(experience + gameConfig.getExperienceRewardDefeat(), profile.getExperience());
     assertSame(Math.max(rating + gameConfig.getRatingResultDefeat(), gameConfig.getRatingMinimal()),
         profile.getRating());
-    assertSame(0, response.award.money);
     assertSame(ProfileState.MAIN_MENU, profile.getState());
   }
 
