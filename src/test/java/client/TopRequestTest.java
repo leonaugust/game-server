@@ -2,6 +2,8 @@ package client;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import common.messages.TopRequest;
+import common.messages.TopResponse;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -43,7 +45,9 @@ public class TopRequestTest extends ConnectAndLoginTests {
       registry.updateUserProfile(user);
     });
 
-    List<TopItem> topList = topService.getTopList();
+    TopResponse response = clientConnection
+        .request(new TopRequest(), TopResponse.class);
+    List<TopItem> topList = response.getTopList();
     assertSame(topListQuantity, topList.size());
   }
 
@@ -58,14 +62,19 @@ public class TopRequestTest extends ConnectAndLoginTests {
       registry.updateUserProfile(user);
     });
 
-    List<TopItem> topList = topService.getTopList();
+    TopResponse response = clientConnection
+        .request(new TopRequest(), TopResponse.class);
+    List<TopItem> topList = response.getTopList();
     assertSame(topListQuantity, topList.size());
     assertSame(15, topList.get(0).rating);
 
     profile.setRating(100);
     registry.updateUserProfile(profile);
     topService.onRatingChange(profile);
-    topList = topService.getTopList();
+
+    response = clientConnection
+        .request(new TopRequest(), TopResponse.class);
+    topList = response.getTopList();
     assertSame(100, topList.get(0).rating);
   }
 
