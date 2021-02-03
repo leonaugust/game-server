@@ -2,16 +2,17 @@ DROP TABLE IF EXISTS user_profile;
 
 CREATE TABLE user_profile
 (
-    id         INT PRIMARY KEY,
-    name       VARCHAR(64) NOT NULL DEFAULT '',
-    level      INT         NOT NULL DEFAULT 1,
-    experience INT         NOT NULL DEFAULT 0,
-    energy     INT         NOT NULL DEFAULT 25,
-    rating     INT         NOT NULL DEFAULT 0,
-    money      INT         NOT NULL DEFAULT 100,
-    backpack   VARCHAR     NOT NULL DEFAULT '',
-    inventory  VARCHAR     NOT NULL DEFAULT '',
-    friends    VARCHAR     NOT NULL DEFAULT ''
+    id                INT PRIMARY KEY,
+    name              VARCHAR(64) NOT NULL DEFAULT '',
+    level             INT         NOT NULL DEFAULT 1,
+    experience        INT         NOT NULL DEFAULT 0,
+    energy            INT         NOT NULL DEFAULT 25,
+    rating            INT         NOT NULL DEFAULT 0,
+    money             INT         NOT NULL DEFAULT 100,
+    backpack          VARCHAR     NOT NULL DEFAULT '',
+    inventory         VARCHAR     NOT NULL DEFAULT '',
+    friends           VARCHAR     NOT NULL DEFAULT '',
+    name_changed_date TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS uid_profile;

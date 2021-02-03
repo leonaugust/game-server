@@ -1,6 +1,7 @@
 package server.domain;
 
 import common.dto.UserProfileStructure;
+import java.util.Date;
 import platform.domain.IUser;
 import server.common.ProfileState;
 
@@ -31,11 +32,13 @@ public class UserProfile implements IUser {
 
     private ProfileState state = ProfileState.MAIN_MENU;
 
+    private Date nameChangedDate;
+
     public UserProfile(int id) {
         this.id = id;
     }
 
-    public UserProfile(int id, String name, int level, int experience, int energy, int rating, int money, List<BackpackItem> backpack, List<InventoryItem> inventory, Set<Integer> friends) {
+    public UserProfile(int id, String name, int level, int experience, int energy, int rating, int money, List<BackpackItem> backpack, List<InventoryItem> inventory, Set<Integer> friends, Date nameChangedDate) {
         this.id = id;
         this.name = name;
         this.level = level;
@@ -46,6 +49,7 @@ public class UserProfile implements IUser {
         this.backpack = backpack;
         this.inventory = inventory;
         this.friends = friends;
+        this.nameChangedDate = nameChangedDate;
     }
 
     public UserProfileStructure serialize() {
@@ -141,6 +145,14 @@ public class UserProfile implements IUser {
 
     public void setState(ProfileState state) {
         this.state = state;
+    }
+
+    public Date getNameChangedDate() {
+        return nameChangedDate;
+    }
+
+    public void setNameChangedDate(Date nameChangedDate) {
+        this.nameChangedDate = nameChangedDate;
     }
 
     @Override

@@ -82,7 +82,8 @@ public class UserProfileDao implements UserProfileRegistry {
                 res.getInt("money"),
                 Arrays.stream(res.getString("backpack").split(",")).filter(s -> !s.isBlank()).map(BackpackItem::new).collect(Collectors.toList()),
                 Arrays.stream(res.getString("inventory").split(",")).filter(s -> !s.isBlank()).map(InventoryItem::new).collect(Collectors.toList()),
-                Arrays.stream(res.getString("friends").split(",")).filter(s -> !s.isBlank()).map(Integer::valueOf).collect(Collectors.toSet())
+                Arrays.stream(res.getString("friends").split(",")).filter(s -> !s.isBlank()).map(Integer::valueOf).collect(Collectors.toSet()),
+                res.getDate("name_changed_date")
         );
     }
 
@@ -99,19 +100,21 @@ public class UserProfileDao implements UserProfileRegistry {
                     money = :money,
                     backpack = :backpack,
                     inventory = :inventory,
-                    friends = :friends
+                    friends = :friends,
+                    name_changed_date = :nameChangedDate
                   where id = :profileId
-                """, Map.of(
-                "profileId", userProfile.id,
-                "name", userProfile.getName(),
-                "level", userProfile.getLevel(),
-                "experience", userProfile.getExperience(),
-                "energy", userProfile.getEnergy(),
-                "rating", userProfile.getRating(),
-                "money", userProfile.getMoney(),
-                "backpack", userProfile.getBackpack().stream().map(BackpackItem::encodeAsString).collect(Collectors.joining(",")),
-                "inventory", userProfile.getInventory().stream().map(InventoryItem::encodeAsString).collect(Collectors.joining(",")),
-                "friends", userProfile.getFriends().stream().map(String::valueOf).collect(Collectors.joining(","))
+                """, Map.ofEntries(
+                Map.entry("profileId", userProfile.id),
+                Map.entry("name", userProfile.getName()),
+                Map.entry("level", userProfile.getLevel()),
+                Map.entry("experience", userProfile.getExperience()),
+                Map.entry("energy", userProfile.getEnergy()),
+                Map.entry("rating", userProfile.getRating()),
+                Map.entry("money", userProfile.getMoney()),
+                Map.entry("backpack", userProfile.getBackpack().stream().map(BackpackItem::encodeAsString).collect(Collectors.joining(","))),
+                Map.entry("inventory", userProfile.getInventory().stream().map(InventoryItem::encodeAsString).collect(Collectors.joining(","))),
+                Map.entry("friends", userProfile.getFriends().stream().map(String::valueOf).collect(Collectors.joining(","))),
+                Map.entry("nameChangedDate", userProfile.getNameChangedDate())
         ));
     }
 
