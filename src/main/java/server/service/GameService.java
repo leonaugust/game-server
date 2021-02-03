@@ -27,6 +27,9 @@ public class GameService {
   private UserProfileRegistry registry;
 
   @Resource
+  private ProfileService profileService;
+
+  @Resource
   private SessionMap sessionMap;
 
   public StartGameResponse startGame(int profileId) {
@@ -65,17 +68,25 @@ public class GameService {
       experience += gameConfig.getExperienceRewardWin();
       rating += gameConfig.getRatingResultWin();
       profile.setMoney(profile.getMoney() + gameConfig.getMoneyRewardWin());
-      response.award.money = gameConfig.getMoneyRewardWin();
     } else {
       experience += gameConfig.getExperienceRewardDefeat();
       rating = Math.max(rating + gameConfig.getRatingResultDefeat(), gameConfig.getRatingMinimal());
     }
-    profile.setExperience(experience);
+
+    AwardStructure award = profileService.handleLevelUpCase(profile, experience);
+    if (award.getMoney() != 0 || award.getEnergy() != 0) {
+      response.award = award;
+      profile.setMoney(profile.getMoney() + award.getMoney());
+      profile.setEnergy(profile.getEnergy() + award.getEnergy());
+    }
+
     profile.setRating(rating);
     profile.setState(ProfileState.MAIN_MENU);
     registry.updateUserProfile(profile);
     log.info("finishGame for user {}", profileId);
     return response;
   }
+
+
 
 }

@@ -1,18 +1,17 @@
 package client;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
+
+import common.dto.AwardStructure;
 import common.messages.StartGameRequest;
 import common.messages.StartGameResponse;
-import org.junit.jupiter.api.Assertions;
+import java.util.stream.IntStream;
+import javax.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import server.ServerApplication;
 import server.domain.UserProfile;
 import server.service.ProfileService;
-
-import javax.annotation.Resource;
-import java.util.stream.IntStream;
-
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 @SpringBootTest(classes = ServerApplication.class)
 public class ProfileTests extends ConnectAndLoginTests {
@@ -21,6 +20,30 @@ public class ProfileTests extends ConnectAndLoginTests {
     ProfileService profileService;
 
     private UserProfile profile;
+
+    @Test
+    public void userReachedNewLevelTest() {
+        successLoginTest();
+        profile = profileService.selectUserProfile(enterAccount.userProfile.id);
+
+        AwardStructure award = profileService.handleLevelUpCase(profile, 25);
+        assertSame(100, award.getMoney());
+        assertSame(100, award.getEnergy());
+        assertSame(5, profile.getExperience());
+        assertSame(2, profile.getLevel());
+    }
+
+    @Test
+    public void userHasNotEnoughExperience() {
+        successLoginTest();
+        profile = profileService.selectUserProfile(enterAccount.userProfile.id);
+
+        AwardStructure award = profileService.handleLevelUpCase(profile, 19);
+        assertSame(0, award.getMoney());
+        assertSame(0, award.getEnergy());
+        assertSame(19, profile.getExperience());
+        assertSame(1, profile.getLevel());
+    }
 
     @Test
     public void withdrawEnergyByStartGameTest() {
